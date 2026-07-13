@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reef Trades · WHALECOIN</title>
+<link rel="icon" href="whale.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ocean-deep: #0a1a2e;
+    --ocean-mid: #123b5e;
+    --ocean-light: #1f6b8a;
+    --ocean-surface: #48b5c2;
+    --coral: #ff6b6b;
+    --sand: #f7e7c8;
+    --seafoam: #7fdbca;
+    --gold: #ffd93d;
+    --white: #ffffff;
+    --radius-xl: 28px;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Orbitron', 'Inter', 'Segoe UI', sans-serif;
+    --green: #4ade80;
+    --red: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: radial-gradient(circle at 20% 0%, var(--ocean-mid) 0%, var(--ocean-deep) 55%);
+    color: var(--white);
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--white);
+  }
+  .brand img { width: 34px; height: 34px; object-fit: contain; }
+  .brand-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+  }
+  .brand-name span { color: var(--gold); }
+  .back-link {
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 7px 14px;
+    border-radius: 999px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .back-link:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    color: rgba(255,255,255,0.5);
+    font-size: 13.5px;
+    margin-bottom: 20px;
+  }
+
+  /* Filtros y dropdowns (igual que antes) */
+  .subfilter-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed rgba(255,255,255,0.08);
+  }
+
+  .dropdown-filter {
+    position: relative;
+  }
+  .dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--white);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 13px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .dropdown-trigger:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.2); }
+  .dropdown-filter.open .dropdown-trigger {
+    background: rgba(127,219,202,0.1);
+    border-color: var(--seafoam);
+    color: var(--seafoam);
+  }
+  .dd-label { color: rgba(255,255,255,0.4); font-weight: 500; }
+  .dropdown-filter.open .dd-label { color: rgba(127,219,202,0.7); }
+  .dd-chevron {
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    transition: transform 0.15s ease;
+    margin-left: 1px;
+  }
+  .dropdown-filter.open .dd-chevron { transform: rotate(180deg); color: var(--seafoam); }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 160px;
+    background: var(--ocean-mid);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-md);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 20;
+  }
+  .dropdown-filter.open .dropdown-menu { display: flex; }
+
+  .dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.65);
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+    white-space: nowrap;
+  }
+  .dropdown-option:hover { background: rgba(255,255,255,0.07); color: var(--white); }
+  .dropdown-option.active {
+    background: rgba(127,219,202,0.14);
+    color: var(--seafoam);
+  }
+  .dropdown-option[data-side="buy"]:hover,
+  .dropdown-option[data-side="buy"].active { background: rgba(74,222,128,0.14); color: var(--green); }
+  .dropdown-option[data-side="sell"]:hover,
+  .dropdown-option[data-side="sell"].active { background: rgba(248,113,113,0.14); color: var(--red); }
+  .dropdown-option[data-value="25000-Infinity"]:hover,
+  .dropdown-option[data-value="25000-Infinity"].active { background: rgba(255,217,61,0.14); color: var(--gold); }
+
+  .dd-dot {
+    width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dd-dot.buy { background: var(--green); }
+  .dd-dot.sell { background: var(--red); }
+
+  @media (max-width: 640px) {
+    .subfilter-row { flex-direction: column; align-items: flex-start; }
+    .dropdown-filter { width: 100%; }
+    .dropdown-trigger { width: 100%; justify-content: space-between; }
+    .dropdown-menu { width: 100%; min-width: 0; }
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.6);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 13px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .filter-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--white); }
+  .filter-btn.active {
+    background: var(--seafoam);
+    border-color: var(--seafoam);
+    color: var(--ocean-deep);
+  }
+  .filter-count {
+    font-size: 10px;
+    font-weight: 800;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+    border-radius: 999px;
+    padding: 1px 6px;
+    min-width: 16px;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .filter-btn.active .filter-count {
+    background: rgba(10,26,46,0.18);
+    color: var(--ocean-deep);
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--green);
+  }
+  .pulse-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 rgba(74,222,128,0.6);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(74,222,128,0.55); }
+    70% { box-shadow: 0 0 0 8px rgba(74,222,128,0); }
+    100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+  }
+
+  .feed-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    backdrop-filter: blur(6px);
+  }
+
+  #tradesList { display: flex; flex-direction: column; }
+
+  /* NUEVO DISEÑO TIPO TABLA HORIZONTAL */
+  .trade-row {
+    display: grid;
+    grid-template-columns: 36px 52px 100px 90px 100px 100px 1fr 28px;
+    align-items: center;
+    gap: 4px 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+    border-left: 2px solid transparent;
+    min-height: 44px;
+  }
+  .trade-row:last-child { border-bottom: none; }
+  .trade-row.buy { border-left-color: rgba(74,222,128,0.55); }
+  .trade-row.sell { border-left-color: rgba(248,113,113,0.55); }
+  .trade-row.buy:hover { background: rgba(74,222,128,0.04); }
+  .trade-row.sell:hover { background: rgba(248,113,113,0.04); }
+
+  .trade-row.flash-new {
+    animation: flashRow 0.8s ease;
+  }
+  @keyframes flashRow {
+    0% { background: rgba(127,219,202,0.25); border-left-color: var(--seafoam); }
+    70% { background: rgba(127,219,202,0.08); }
+    100% { background: transparent; }
+  }
+
+  .trade-row.whale-size { border-left-width: 4px; }
+  .trade-row.whale-size.buy { border-left-color: var(--green); background: linear-gradient(90deg, rgba(74,222,128,0.07), transparent 60%); }
+  .trade-row.whale-size.sell { border-left-color: var(--red); background: linear-gradient(90deg, rgba(248,113,113,0.07), transparent 60%); }
+
+  /* Celdas específicas */
+  .trade-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .trade-icon img { width: 100%; height: 100%; object-fit: contain; border-radius: 4px; }
+
+  .trade-type {
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 3px 0;
+    border-radius: 5px;
+  }
+  .trade-type.buy { background: rgba(74,222,128,0.15); color: var(--green); }
+  .trade-type.sell { background: rgba(248,113,113,0.15); color: var(--red); }
+
+  .trade-symbol { font-weight: 600; color: var(--white); }
+  .trade-amount { color: rgba(255,255,255,0.9); }
+  .trade-price { color: rgba(255,255,255,0.7); }
+  .trade-total-ada { font-weight: 600; color: var(--gold); }
+  .trade-total-usd { color: rgba(255,255,255,0.5); font-size: 11px; }
+
+  .trade-links {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .trade-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 999px;
+    padding: 1px 6px 1px 4px;
+    font-size: 9.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .trade-link:hover {
+    background: rgba(72,181,194,0.15);
+    border-color: var(--seafoam);
+    color: var(--seafoam);
+  }
+  .trade-link .link-icon { font-size: 10px; }
+
+  .trade-time {
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .trade-row {
+      grid-template-columns: 28px 48px 70px 60px 70px 70px 1fr 24px;
+      gap: 3px 4px;
+      padding: 6px 8px;
+      font-size: 10px;
+    }
+    .trade-link { font-size: 8px; padding: 0 4px; }
+    .trade-total-usd { display: none; } /* ocultamos USD en móvil */
+  }
+  @media (max-width: 500px) {
+    .trade-row {
+      grid-template-columns: 24px 40px 60px 50px 60px 1fr 20px;
+      gap: 2px 3px;
+      padding: 5px 6px;
+    }
+    .trade-total-ada { font-size: 10px; }
+  }
+
+  /* Spinner y estados vacíos */
+  .loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    gap: 12px;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+  }
+  .spinner-ring {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255,255,255,0.08);
+    border-top: 3px solid var(--seafoam);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .empty-state, .error-state {
+    text-align: center;
+    padding: 46px 20px;
+    color: rgba(255,255,255,0.4);
+    font-size: 13px;
+  }
+  .empty-state .empty-icon, .error-state .empty-icon {
+    font-size: 26px;
+    margin-bottom: 10px;
+    display: block;
+    opacity: 0.7;
+  }
+  .error-state { color: rgba(248,113,113,0.75); }
+
+  .load-more-btn {
+    display: block;
+    width: calc(100% - 32px);
+    margin: 12px 16px 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.65);
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .load-more-btn:hover {
+    background: rgba(127,219,202,0.1);
+    border-color: var(--seafoam);
+    color: var(--seafoam);
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+  }
+  footer a { color: rgba(255,255,255,0.4); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <a href="index.html" class="brand">
+        <img src="whale.png" alt="WHALECOIN" />
+        <span class="brand-name">WHALE<span>COIN</span></span>
+      </a>
+      <a href="index.html" class="back-link">← Back to dashboard</a>
+    </header>
+
+    <h1>🐋 Reef Trades</h1>
+    <p class="subtitle">Recent on-chain swaps for the reef tokens held in the vault.</p>
+
+    <div class="toolbar">
+      <div class="filters" id="filters">
+        <button class="filter-btn active" data-symbol="ALL">All <span class="filter-count" data-count="ALL">0</span></button>
+        <button class="filter-btn" data-symbol="STRIKE">STRIKE <span class="filter-count" data-count="STRIKE">0</span></button>
+        <button class="filter-btn" data-symbol="ASCEND">ASCEND <span class="filter-count" data-count="ASCEND">0</span></button>
+        <button class="filter-btn" data-symbol="SURF">SURF <span class="filter-count" data-count="SURF">0</span></button>
+        <button class="filter-btn" data-symbol="PULSE">PULSE <span class="filter-count" data-count="PULSE">0</span></button>
+        <button class="filter-btn" data-symbol="ATLAS">ATLAS <span class="filter-count" data-count="ATLAS">0</span></button>
+      </div>
+    </div>
+
+    <div class="subfilter-row">
+      <div class="dropdown-filter" id="sideDropdown">
+        <button class="dropdown-trigger" id="sideDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="dd-label">Side:</span>
+          <span class="dd-value" id="sideDropdownValue">All sides</span>
+          <span class="dd-chevron">▾</span>
+        </button>
+        <div class="dropdown-menu" id="sideDropdownMenu" role="listbox">
+          <button class="dropdown-option active" data-side="ALL" role="option">All sides</button>
+          <button class="dropdown-option" data-side="buy" role="option"><span class="dd-dot buy"></span>Buy</button>
+          <button class="dropdown-option" data-side="sell" role="option"><span class="dd-dot sell"></span>Sell</button>
+        </div>
+      </div>
+
+      <div class="dropdown-filter" id="valueDropdown">
+        <button class="dropdown-trigger" id="valueDropdownTrigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="dd-label">Size:</span>
+          <span class="dd-value" id="valueDropdownValue">Any size</span>
+          <span class="dd-chevron">▾</span>
+        </button>
+        <div class="dropdown-menu" id="valueDropdownMenu" role="listbox">
+          <button class="dropdown-option active" data-value="ANY" role="option">Any size</button>
+          <button class="dropdown-option" data-value="0-500" role="option">&lt;500 ₳</button>
+          <button class="dropdown-option" data-value="500-5000" role="option">500–5K ₳</button>
+          <button class="dropdown-option" data-value="5000-25000" role="option">5K–25K ₳</button>
+          <button class="dropdown-option" data-value="25000-Infinity" role="option">🐋 25K+ ₳</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="feed-card">
+      <div id="tradesList">
+        <!-- Inicialmente esqueletos -->
+        <div class="skeleton-row" style="height:44px; margin:6px 12px; border-radius:6px; background:rgba(255,255,255,0.03);"></div>
+        <div class="skeleton-row" style="height:44px; margin:6px 12px; border-radius:6px; background:rgba(255,255,255,0.03);"></div>
+        <div class="skeleton-row" style="height:44px; margin:6px 12px; border-radius:6px; background:rgba(255,255,255,0.03);"></div>
+        <div class="skeleton-row" style="height:44px; margin:6px 12px; border-radius:6px; background:rgba(255,255,255,0.03);"></div>
+      </div>
+    </div>
+
+    <footer>Data via GeckoTerminal (on-chain DEX activity, Cardano).</footer>
+  </div>
+
+<script>
+  const TRADES_ENDPOINT = '/api/trades';
+  const POLL_MS = 30_000;
+  const TICK_MS = 1_000;
+  const WHALE_ADA_THRESHOLD = 25000;
+  let allTrades = [];
+  let seenKeys = new Set();
+  let isFirstLoad = true;
+  let activeFilter = 'ALL';
+  let activeSide = 'ALL';
+  let activeValueRange = null; // [min, max]
+  const PAGE_SIZE = 20;
+  let visibleCount = PAGE_SIZE;
+  let isLoading = false;
+
+  // Para USD, usamos el precio de ADA que ya se actualiza en el frontend
+  let adaUsdPrice = 0.4; // fallback, pero se actualizará con fetchAdaUsdPrice()
+
+  const ICON_MAP = {
+    'STRIKE': `<img src="https://www.google.com/s2/favicons?domain=strikefinance.org&sz=64" />`,
+    'ASCEND': `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23ff6b35'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='white' font-weight='bold' font-family='sans-serif'%3EA%3C/text%3E%3C/svg%3E" />`,
+    'SURF': `<img src="https://www.google.com/s2/favicons?domain=surflending.org&sz=64" />`,
+    'PULSE': `<img src="https://www.google.com/s2/favicons?domain=pulsecardano.org&sz=64" />`,
+    'ATLAS': `<img src="https://www.google.com/s2/favicons?domain=atlas-defi.com&sz=64" />`,
+    'OURO': `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23f5a623'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%23e0962a' stroke-width='4'/%3E%3Ctext x='50' y='66' font-size='44' text-anchor='middle' fill='white' font-weight='bold' font-family='sans-serif'%3EO%3C/text%3E%3C/svg%3E" />`,
+    'WHALE': `<img src="whale.png" />`,
+  };
+
+  function tradeKey(t) {
+    return t.txHash || `${t.symbol}-${t.side}-${t.timestamp}-${t.tokenAmount}`;
+  }
+
+  function timeAgo(ts) {
+    if (!ts) return '—';
+    const diff = Math.max(0, Date.now() - ts);
+    const s = Math.floor(diff / 1000);
+    if (s < 60) return s + 's';
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + 'm';
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + 'h';
+    return Math.floor(h / 24) + 'd';
+  }
+
+  function tickTimestamps() {
+    document.querySelectorAll('.trade-time[data-ts]').forEach(el => {
+      el.textContent = timeAgo(Number(el.dataset.ts));
+    });
+  }
+
+  function fmtAmount(n) {
+    if (n == null || !isFinite(n)) return '—';
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M';
+    if (n >= 1_000) return (n / 1_000).toFixed(2) + 'K';
+    return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
+  function fmtPrice(n) {
+    if (n == null || !isFinite(n)) return '—';
+    return n.toLocaleString('en-US', { maximumSignificantDigits: 4 });
+  }
+
+  function shortWallet(w) {
+    if (!w) return null;
+    return w.slice(0, 6) + '…' + w.slice(-4);
+  }
+
+  function getAdaValue(t) {
+    return (t.tokenAmount != null && t.priceAda != null) ? t.tokenAmount * t.priceAda : null;
+  }
+
+  function updateFilterCounts() {
+    const counts = { ALL: allTrades.length };
+    for (const t of allTrades) counts[t.symbol] = (counts[t.symbol] || 0) + 1;
+    document.querySelectorAll('.filter-count').forEach(el => {
+      const key = el.dataset.count;
+      el.textContent = counts[key] || 0;
+    });
+  }
+
+  function matchesActiveFilters(t) {
+    if (activeFilter !== 'ALL' && t.symbol !== activeFilter) return false;
+    if (activeSide !== 'ALL' && t.side !== activeSide) return false;
+    if (activeValueRange) {
+      const [min, max] = activeValueRange;
+      const v = getAdaValue(t);
+      if (v == null || v < min || v >= max) return false;
+    }
+    return true;
+  }
+
+  function getFilteredTrades() {
+    return allTrades.filter(matchesActiveFilters);
+  }
+
+  // Construye la fila con las nuevas columnas
+  function buildRowHtml(t) {
+    const iconHtml = ICON_MAP[t.symbol] || '◆';
+    const sideClass = t.side;
+    const typeLabel = t.side === 'buy' ? 'Buy' : 'Sell';
+    const amount = t.tokenAmount != null ? fmtAmount(t.tokenAmount) : '—';
+    const symbol = t.symbol;
+    const price = t.priceAda != null ? fmtPrice(t.priceAda) + ' ₳' : '—';
+    const adaValue = getAdaValue(t);
+    const adaValueStr = adaValue != null ? fmtAmount(adaValue) + ' ₳' : '—';
+    const usdValue = adaValue != null && adaUsdPrice > 0 ? fmtAmount(adaValue * adaUsdPrice) + ' $' : '—';
+    const isWhale = adaValue != null && adaValue >= WHALE_ADA_THRESHOLD;
+    const whaleTag = isWhale ? ' 🐋' : '';
+
+    const walletUrl = t.wallet ? `https://cardanoscan.io/address/${t.wallet}` : null;
+    const txUrl = t.txHash ? `https://cardanoscan.io/transaction/${t.txHash}` : null;
+
+    const walletLink = walletUrl ? `<a href="${walletUrl}" target="_blank" rel="noopener" class="trade-link"><span class="link-icon">👤</span>${shortWallet(t.wallet)}</a>` : '';
+    const txLink = txUrl ? `<a href="${txUrl}" target="_blank" rel="noopener" class="trade-link"><span class="link-icon">⛓️</span>tx</a>` : '';
+
+    return `
+      <div class="trade-row ${sideClass}${isWhale ? ' whale-size' : ''}" data-key="${tradeKey(t)}">
+        <span class="trade-icon">${iconHtml}</span>
+        <span class="trade-type ${sideClass}">${typeLabel}</span>
+        <span class="trade-amount">${amount} ${symbol}${whaleTag}</span>
+        <span class="trade-price">${price}</span>
+        <span class="trade-total-ada">${adaValueStr}</span>
+        <span class="trade-total-usd">${usdValue}</span>
+        <div class="trade-links">
+          ${walletLink}
+          ${txLink}
+        </div>
+        <span class="trade-time" data-ts="${t.timestamp}">${timeAgo(t.timestamp)}</span>
+      </div>
+    `;
+  }
+
+  function render() {
+    updateFilterCounts();
+    const list = document.getElementById('tradesList');
+    const filtered = getFilteredTrades();
+
+    // Orden cronológico descendente
+    filtered.sort((a, b) => b.timestamp - a.timestamp);
+
+    const noMatchesReason = [
+      activeFilter !== 'ALL' ? activeFilter : null,
+      activeSide !== 'ALL' ? activeSide : null,
+      activeValueRange ? 'that size' : null,
+    ].filter(Boolean).join(' · ');
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty-state"><span class="empty-icon">🌊</span>No recent trades${noMatchesReason ? ' matching ' + noMatchesReason : ''} in the last 24hs.</div>`;
+      return;
+    }
+
+    const toShow = filtered.slice(0, visibleCount);
+    const remaining = filtered.length - toShow.length;
+
+    list.innerHTML = toShow.map(buildRowHtml).join('');
+
+    if (remaining > 0) {
+      list.insertAdjacentHTML('beforeend', `<button class="load-more-btn" id="loadMoreBtn">Show ${Math.min(remaining, PAGE_SIZE)} more (${remaining} left)</button>`);
+      document.getElementById('loadMoreBtn').addEventListener('click', () => {
+        visibleCount += PAGE_SIZE;
+        render();
+      });
+    }
+  }
+
+  function showLoading() {
+    const list = document.getElementById('tradesList');
+    list.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <span>Loading trades…</span>
+      </div>
+    `;
+  }
+
+  function prependNewTradesWithFlash(newOnes) {
+    const matching = newOnes.filter(matchesActiveFilters).sort((a, b) => a.timestamp - b.timestamp);
+    if (matching.length === 0) return;
+
+    const list = document.getElementById('tradesList');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+    matching.forEach(t => {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = buildRowHtml(t).trim();
+      const rowEl = wrapper.firstElementChild;
+      rowEl.classList.add('flash-new');
+      list.insertBefore(rowEl, list.firstChild);
+    });
+
+    visibleCount += matching.length;
+
+    const remaining = getFilteredTrades().length - visibleCount;
+    if (loadMoreBtn) {
+      if (remaining > 0) {
+        loadMoreBtn.textContent = `Show ${Math.min(remaining, PAGE_SIZE)} more (${remaining} left)`;
+      } else {
+        loadMoreBtn.remove();
+      }
+    }
+  }
+
+  async function fetchTrades() {
+    if (isLoading) return;
+    isLoading = true;
+
+    const list = document.getElementById('tradesList');
+    if (allTrades.length === 0 && list.querySelector('.trade-row') === null) {
+      showLoading();
+    }
+
+    try {
+      const res = await fetch(TRADES_ENDPOINT);
+      if (!res.ok) throw new Error('trades ' + res.status);
+      const data = await res.json();
+      const freshTrades = data.trades || [];
+
+      if (freshTrades.length === 0) {
+        if (allTrades.length === 0) {
+          render();
+        }
+        isLoading = false;
+        return;
+      }
+
+      if (isFirstLoad) {
+        allTrades = freshTrades;
+        freshTrades.forEach(t => seenKeys.add(tradeKey(t)));
+        isFirstLoad = false;
+        render();
+        isLoading = false;
+        return;
+      }
+
+      const newOnes = freshTrades.filter(t => !seenKeys.has(tradeKey(t)));
+      allTrades = freshTrades;
+      newOnes.forEach(t => seenKeys.add(tradeKey(t)));
+
+      const hasRenderedRows = list.querySelector('.trade-row') !== null;
+
+      if (!hasRenderedRows) {
+        render();
+      } else {
+        updateFilterCounts();
+        if (newOnes.length > 0) {
+          prependNewTradesWithFlash(newOnes);
+        }
+      }
+    } catch (e) {
+      console.warn('No se pudo obtener el feed de trades:', e.message);
+      updateFilterCounts();
+      if (allTrades.length === 0) {
+        document.getElementById('tradesList').innerHTML =
+          `<div class="error-state"><span class="empty-icon">⚠️</span>Couldn't load live trades right now. Retrying…</div>`;
+      }
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  // Actualiza el precio de ADA para USD (se llama desde el script principal)
+  window.updateAdaUsdPrice = (price) => {
+    adaUsdPrice = price;
+  };
+
+  document.getElementById('filters').addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.symbol;
+    visibleCount = PAGE_SIZE;
+    render();
+  });
+
+  function setupDropdown({ dropdownId, triggerId, menuId, valueLabelId, onSelect }) {
+    const dropdown = document.getElementById(dropdownId);
+    const trigger = document.getElementById(triggerId);
+    const menu = document.getElementById(menuId);
+    const valueLabel = document.getElementById(valueLabelId);
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = !dropdown.classList.contains('open');
+      closeAllDropdowns();
+      if (willOpen) {
+        dropdown.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    menu.addEventListener('click', (e) => {
+      const opt = e.target.closest('.dropdown-option');
+      if (!opt) return;
+      menu.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      valueLabel.textContent = opt.textContent.trim();
+      onSelect(opt);
+      closeAllDropdowns();
+      visibleCount = PAGE_SIZE;
+      render();
+    });
+  }
+
+  function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-filter.open').forEach(d => {
+      d.classList.remove('open');
+      d.querySelector('.dropdown-trigger')?.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  document.addEventListener('click', closeAllDropdowns);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAllDropdowns(); });
+
+  setupDropdown({
+    dropdownId: 'sideDropdown',
+    triggerId: 'sideDropdownTrigger',
+    menuId: 'sideDropdownMenu',
+    valueLabelId: 'sideDropdownValue',
+    onSelect: (opt) => { activeSide = opt.dataset.side; },
+  });
+
+  setupDropdown({
+    dropdownId: 'valueDropdown',
+    triggerId: 'valueDropdownTrigger',
+    menuId: 'valueDropdownMenu',
+    valueLabelId: 'valueDropdownValue',
+    onSelect: (opt) => {
+      const raw = opt.dataset.value;
+      activeValueRange = raw === 'ANY' ? null : raw.split('-').map(Number);
+    },
+  });
+
+  fetchTrades();
+  setInterval(fetchTrades, POLL_MS);
+  setInterval(tickTimestamps, TICK_MS);
+</script>
+</body>
+</html>
